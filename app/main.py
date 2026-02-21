@@ -222,9 +222,13 @@ def main():
     st.set_page_config(page_title="GraphBees", page_icon="🐝", layout="centered")
     download_container, shutdown_disabled = render_sidebar()
 
-    # Session state for chat history
+    # Session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "upload_key" not in st.session_state:
+        st.session_state.upload_key = 0
+    if "pending_attachment" not in st.session_state:
+        st.session_state.pending_attachment = None
 
     inject_shared_css()
     # Global UI polish
@@ -323,7 +327,33 @@ def main():
             else:
                 st.markdown(_escape_dollars(msg["content"]), unsafe_allow_html=True)
 
-    # Chat input (or pending example prompt from Algorithms page)
+    # File attachment (above the chat input)
+    _MAX_BYTES = 1 * 1024 * 1024
+    uploaded = st.file_uploader(
+        "Attach a file",
+        type=["txt", "csv"],
+        label_visibility="collapsed",
+        key=f"upload_{st.session_state.upload_key}",
+    )
+    if uploaded is not None:
+        raw = uploaded.getvalue()
+        if len(raw) > _MAX_BYTES:
+            st.warning(f"{uploaded.name} exceeds 1 MB — file ignored.")
+            st.session_state.pending_attachment = None
+        else:
+            try:
+                st.session_state.pending_attachment = {
+                    "name": uploaded.name,
+                    "text": raw.decode("utf-8"),
+                }
+                st.caption(f"📎 {uploaded.name} · {len(raw):,} bytes")
+            except UnicodeDecodeError:
+                st.warning(f"{uploaded.name} is not valid text — file ignored.")
+                st.session_state.pending_attachment = None
+    else:
+        st.session_state.pending_attachment = None
+
+    # Chat input (or pending example prompt from Tutorials page)
     prompt = None
     if "example_prompt" in st.session_state:
         prompt = st.session_state.pop("example_prompt")
@@ -331,16 +361,20 @@ def main():
         prompt = user_prompt
 
     if prompt:
-        # Add user message
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        attachment = st.session_state.pending_attachment
+        full_prompt = f"{prompt}\n\n[Attached file: {attachment['name']}]\n{attachment['text']}" \
+            if attachment else prompt
+        display_prompt = f"{prompt}\n\n📎 {attachment['name']}" if attachment else prompt
+
+        st.session_state.messages.append({"role": "user", "content": display_prompt})
         with st.chat_message("user"):
-            st.markdown(_escape_dollars(prompt))
+            st.markdown(_escape_dollars(display_prompt))
 
         # Run agent
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
-                    result = run(prompt)
+                    result = run(full_prompt)
                 except Exception as e:
                     st.error(f"Error: {e}")
                     st.session_state.messages.append({
@@ -364,6 +398,11 @@ def main():
                 "content": answer,
                 "tool_logs": result.get("tool_logs", []),
             })
+
+        # Clear attachment after use
+        st.session_state.pending_attachment = None
+        st.session_state.upload_key += 1
+        st.rerun()
 
     render_chat_download(download_container, st.session_state.messages)
 
