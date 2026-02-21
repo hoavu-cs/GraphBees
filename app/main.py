@@ -275,10 +275,6 @@ def main():
     # Session state
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    if "upload_key" not in st.session_state:
-        st.session_state.upload_key = 0
-    if "pending_attachment" not in st.session_state:
-        st.session_state.pending_attachment = None
 
     inject_shared_css()
     # Global UI polish
@@ -361,6 +357,7 @@ def main():
         '<h1 style="margin:0; font-size:19px; font-weight:700; letter-spacing:-0.3px;">GraphBees</h1>'
         '<p style="margin:0; font-size:12px; opacity:0.55;">Provably correct instead of probably correct</p>'
         '<p style="margin:0; font-size:12px; opacity:0.55;">Query → LLM → <b>Algorithmic Solvers</b> → Solution → LLM</p>'
+        '<p style="margin:0; font-size:12px; opacity:0.55;">Optional: Click "+" in the chat box to attach files (e.g. problem instances or datasets, limit: 1Mb)</p>'
         '</div></div>',
         unsafe_allow_html=True,
     )
@@ -377,41 +374,28 @@ def main():
             else:
                 st.markdown(_escape_dollars(msg["content"]), unsafe_allow_html=True)
 
-    # File attachment (above the chat input)
-    _MAX_BYTES = 1 * 1024 * 1024
-    uploaded = st.file_uploader(
-        "Optional: Attach a file (to provide data more easily)",
-        type=["txt", "csv"],
-        label_visibility="visible",
-        key=f"upload_{st.session_state.upload_key}",
+    # Chat input with optional file attachment
+    result = st.chat_input(
+        "Describe your problem...",
+        accept_file=True,
+        file_type=["txt", "csv"],
+        max_upload_size=1,
     )
-    if uploaded is not None:
-        raw = uploaded.getvalue()
-        if len(raw) > _MAX_BYTES:
-            st.warning(f"{uploaded.name} exceeds 1 MB — file ignored.")
-            st.session_state.pending_attachment = None
-        else:
-            try:
-                st.session_state.pending_attachment = {
-                    "name": uploaded.name,
-                    "text": raw.decode("utf-8"),
-                }
-                st.caption(f"📎 {uploaded.name} · {len(raw):,} bytes")
-            except UnicodeDecodeError:
-                st.warning(f"{uploaded.name} is not valid text — file ignored.")
-                st.session_state.pending_attachment = None
-    else:
-        st.session_state.pending_attachment = None
 
-    # Chat input (or pending example prompt from Tutorials page)
     prompt = None
+    attachment = None
     if "example_prompt" in st.session_state:
         prompt = st.session_state.pop("example_prompt")
-    elif user_prompt := st.chat_input("Describe your problem..."):
-        prompt = user_prompt
+    elif result:
+        prompt = result.text or ""
+        if result.files:
+            f = result.files[0]
+            try:
+                attachment = {"name": f.name, "text": f.getvalue().decode("utf-8")}
+            except UnicodeDecodeError:
+                st.warning(f"{f.name} is not valid UTF-8 text — file ignored.")
 
-    if prompt:
-        attachment = st.session_state.pending_attachment
+    if prompt or attachment:
         full_prompt = f"{prompt}\n\n[Attached file: {attachment['name']}]\n{attachment['text']}" \
             if attachment else prompt
         display_prompt = f"{prompt}\n\n📎 {attachment['name']}" if attachment else prompt
@@ -450,9 +434,6 @@ def main():
                 "tool_logs": result.get("tool_logs", []),
             })
 
-        # Clear attachment after use
-        st.session_state.pending_attachment = None
-        st.session_state.upload_key += 1
         st.rerun()
 
     render_chat_download(download_container, st.session_state.messages)

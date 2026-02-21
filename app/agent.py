@@ -228,7 +228,6 @@ def _bin_packing_chart_data(args: dict, result: dict) -> dict:
 def _makespan_chart_data(args: dict, result: dict) -> dict:
     """Build chart data for makespan scheduling as a Gantt-style bar chart."""
     jobs = args.get("jobs", [])
-    m = args.get("m", 1)
     machines = result.get("machines", [])  # list of lists of 0-indexed job indices
 
     machine_data = []
@@ -252,13 +251,3 @@ def _format_args(tool_name: str, args: dict) -> str:
         else:
             parts.append(f"{k}={v}")
     return ", ".join(parts)
-
-
-def _ensure_min_julia_version() -> None:
-    ok = bool(jl.seval('VERSION >= v"1.12.0"'))
-    if not ok:
-        found = str(jl.seval("string(VERSION)"))
-        raise RuntimeError(
-            f"GraphBees requires Julia >= 1.12.0, but found Julia {found}. "
-            "Set PYTHON_JULIACALL_EXE to a Julia 1.12+ binary."
-        )
