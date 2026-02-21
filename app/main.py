@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 from app.agent import run
 from app.julia_bridge.runner import init_julialg
 from app.sidebar import maybe_shutdown, render_chat_download, render_sidebar
+from app.styles import inject_shared_css
 
 load_dotenv()
 
@@ -225,6 +226,7 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    inject_shared_css()
     # Global UI polish
     st.markdown(
         """<style>

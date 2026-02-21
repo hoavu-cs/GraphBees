@@ -13,6 +13,7 @@ if _repo_root not in sys.path:
 import streamlit as st
 
 from app.sidebar import maybe_shutdown, render_chat_download, render_sidebar
+from app.styles import inject_shared_css
 
 KNAPSACK_EXAMPLE = """
 I have a budget of $1000. 
@@ -327,7 +328,7 @@ ALGORITHM_CATEGORIES = {
 def _render_algorithm_group(group_name: str) -> None:
     for algorithm in ALGORITHM_CATEGORIES[group_name]:
         with st.container(border=True):
-            st.markdown(f"### {algorithm['name']}")
+            st.markdown(f"#### {algorithm['name']}")
             st.markdown(algorithm['high_level'])
             with st.expander("Details & Example"):
                 st.caption(
@@ -346,51 +347,17 @@ def main():
     st.set_page_config(page_title="GraphBees Tutorials", page_icon="🐝", layout="wide")
     download_container, shutdown_disabled = render_sidebar()
 
+    inject_shared_css()
     st.markdown(
         """<style>
-        .block-container {padding-top: 1.2rem; padding-bottom: 1.5rem;}
-        [data-testid="stSidebar"] .block-container { padding-top: 1rem; }
-        [data-testid="stSidebar"] p,
-        [data-testid="stSidebar"] li,
-        [data-testid="stSidebar"] a,
-        [data-testid="stSidebar"] label,
-        [data-testid="stSidebar"] [data-testid="stExpander"] summary p {
-            font-size: 13px !important;
-        }
-        [data-testid="stSidebar"] div[data-testid="stButton"] > button {
-            background-color: #d93025 !important;
-            color: #ffffff !important;
-            border: 1px solid #d93025 !important;
-        }
-        [data-testid="stSidebar"] div[data-testid="stButton"] > button:hover {
-            background-color: #b3261e !important;
-            border-color: #b3261e !important;
-            color: #ffffff !important;
-        }
-        [data-testid="stSidebar"] div[data-testid="stButton"] > button:disabled {
-            background-color: #f2f2f2 !important;
-            color: #9a9a9a !important;
-            border-color: #e0e0e0 !important;
-        }
-        div[data-testid="stCodeBlock"] pre {
-            white-space: pre-wrap !important;
-            word-break: break-word !important;
-            overflow-wrap: anywhere !important;
-            border-radius: 10px !important;
-        }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #c8c8d8; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a0a0b8; }
-        [data-testid="stExpander"] {
-            border-radius: 10px !important;
-            border-color: #eeeef2 !important;
-        }
-        [data-testid="stAlert"] { border-radius: 8px !important; }
+        .block-container p, .block-container li, .block-container label { font-size: 13px !important; }
+        .block-container h1 { font-size: 1.3rem !important; }
+        .block-container h2 { font-size: 1.1rem !important; }
+        .block-container h3 { font-size: 1rem !important; }
+        .block-container h4 { font-size: 0.9rem !important; }
         </style>""",
         unsafe_allow_html=True,
     )
-
     maybe_shutdown(shutdown_disabled)
 
     st.title("Optimization Tutorials")

@@ -4,6 +4,15 @@ import streamlit as st
 
 _SHARED_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap');
+
+* { font-family: 'Source Serif 4', serif !important; }
+/* Restore Streamlit's icon font so button/expander icons don't break */
+[data-testid="stIconMaterial"],
+.material-icons,
+.material-symbols-rounded {
+    font-family: 'Material Symbols Rounded' !important;
+}
 .block-container {
     padding-top: 1.25rem;
     padding-bottom: 1.5rem;
