@@ -78,6 +78,22 @@ Choose at most 5 sensors to cover as many distinct locations as possible.
 Which sensors should you pick, and how many locations will they cover?
 """
 
+MAKESPAN_EXAMPLE = """
+You have 3 teams of employees available to work on a set of tasks.
+Each task has a certain duration.
+Your goal is to assign tasks to teams to minimize the total completion time (makespan) across all teams.
+Tasks and durations:
+- Task 1: 4 hours
+- Task 2: 3 hours
+- Task 3: 2 hours
+- Task 4: 7 hours
+- Task 5: 5.5 hours
+- Task 6: 9 hours
+- Task 7: 10 hours
+- Task 8: 9.5 hours
+- Task 9: 6 hours
+"""
+
 MILP_EXAMPLE = """
 Goal: Maximize total calories while staying under 20g fat.
 Constraints: At most one rice, one beans, and one protein.
@@ -265,32 +281,46 @@ ALGORITHM_CATEGORIES = {
                 "Pick 10 features to satisfy the most user requirements"
             ]
         },
+                {
+            "name": "Makespan Scheduling",
+            "description": "Assign jobs to machines to minimize the maximum completion time",
+            "high_level": "Distribute independent jobs across parallel machines so that the busiest machine finishes as early as possible.",
+            "algorithm": "Longest Processing Time (LPT) Heuristic",
+            "guarantee": "(4/3 - 1/(3m))-approximation",
+            "complexity": "O(n log n)",
+            "full_example": MAKESPAN_EXAMPLE,
+            "example_prompts": [
+                "Assign tasks to 3 teams to minimize total completion time",
+                "Schedule jobs on 4 machines to minimize the makespan",
+                "Distribute workloads across servers to balance processing time"
+            ]
+        },
         {
             "name": "Mixed Integer Linear Programming",
             "description": "Formulate and solve a mixed integer linear program",
-            "high_level": "When a problem doesn't match built-in templates, model it with linear variables, constraints, and an objective, then solve exactly with an ILP solver.",
+            "high_level": "When a problem doesn't match built-in templates, model it with linear variables, constraints, and an objective, then solve exactly with an MILP solver. MILP is very flexible and can express a wide range of combinatorial optimization problems, but it may be a lot slower since this is an NP-Hard problem in general.",
             "algorithm": "JuMP + HiGHS (MILP)",
             "guarantee": "Exact (for solved model)",
             "complexity": "Problem-dependent",
             "full_example": MILP_EXAMPLE,
             "example_prompts": [
                 "Formulate and solve this linear optimization model with constraints and objective",
-                "Use mixed ILP for this scheduling model with integer decision variables",
-                "This doesn’t match knapsack/bin packing; convert it to an ILP and solve"
+                "Use mixed MILP for this scheduling model with integer decision variables",
+                "This doesn’t match knapsack/bin packing; convert it to an MILP instance and solve"
             ]
         },
         {
             "name": "Mixed Integer Linear Programming Feasibility",
             "description": "Formulate and solve a mixed integer linear program",
-            "high_level": "When a feasibility (i.e., finding any solution that satisfies all constraints) problem doesn't match built-in templates, model it with linear variables, constraints, then solve exactly with an ILP solver.",
+            "high_level": "When a feasibility (i.e., finding any solution that satisfies all constraints) problem doesn't match built-in templates, model it with linear variables, constraints, then solve exactly with an MILP solver.",
             "algorithm": "JuMP + HiGHS (MILP)",
             "guarantee": "Exact (for solved model)",
             "complexity": "Problem-dependent",
             "full_example": FEASIBILITY_MILP_EXAMPLE,
             "example_prompts": [
                 "Formulate and solve this linear optimization model with constraints and objective",
-                "Use mixed ILP for this scheduling model with integer decision variables",
-                "This doesn’t match knapsack/bin packing; convert it to an ILP and solve"
+                "Use mixed MILP for this scheduling model with integer decision variables",
+                "This doesn’t match knapsack/bin packing; convert it to an MILP and solve"
             ]
         },
         {
