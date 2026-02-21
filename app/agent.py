@@ -33,6 +33,7 @@ which non-overlapping set maximizes value?"https://github.com/anthropics/claude-
 - **Set cover** — "I need to cover all elements using subsets, each with a cost; minimize total cost."
 - **Max coverage** — "I can pick at most k subsets; maximize the number of distinct elements covered."
 - **Weighted bipartite matching** — "I have two groups (workers/jobs, students/schools, etc.) and need to match them one-to-one to maximize total value/profit." Use `weighted_bipartite_matching`.
+- **Makespan scheduling** — "I have n jobs with processing times and m parallel machines; assign jobs to minimize the maximum machine load." Use `makespan_scheduling`.
 
 ### ILP fallback
 - If a prompt is optimization-related but does not fit the five categories above,
@@ -67,7 +68,7 @@ In your final response for mixed ILP, include:
     - a **Constraints Summary** that clearly restates each constraint.
 8. If the problem is not optimization-related or cannot be represented as a linear model,
 say so and explain these supported types:
-0/1 Knapsack, Bin packing, Weighted interval scheduling, Set cover, Max coverage, Weighted Bipartite Matching, mixed ILP."""
+0/1 Knapsack, Bin packing, Weighted interval scheduling, Set cover, Max coverage, Weighted Bipartite Matching, Makespan Scheduling, mixed ILP."""
 
 def _to_openai_tools(tools: list[dict]) -> list[dict]:
     """Convert our tool schemas to OpenAI function-calling format."""
@@ -150,6 +151,8 @@ def run(user_message: str) -> dict:
                     log["chart"] = _interval_chart_data(args, result)
                 elif name == "bin_packing":
                     log["chart"] = _bin_packing_chart_data(args, result)
+                elif name == "makespan_scheduling":
+                    log["chart"] = _makespan_chart_data(args, result)
             except Exception as e:
                 content = json.dumps({"error": str(e)})
                 log["error"] = str(e)
@@ -220,6 +223,22 @@ def _bin_packing_chart_data(args: dict, result: dict) -> dict:
         bin_data.append({"label": f"Bin {i}", "sizes": sizes, "item_indices": bin_items})
 
     return {"type": "bin_packing", "bins": bin_data, "capacity": bin_capacity}
+
+
+def _makespan_chart_data(args: dict, result: dict) -> dict:
+    """Build chart data for makespan scheduling as a Gantt-style bar chart."""
+    jobs = args.get("jobs", [])
+    m = args.get("m", 1)
+    machines = result.get("machines", [])  # list of lists of 0-indexed job indices
+
+    machine_data = []
+    for i, job_indices in enumerate(machines):
+        machine_data.append({
+            "label": str(i),
+            "jobs": [{"index": j, "duration": jobs[j]} for j in job_indices],
+        })
+
+    return {"type": "makespan", "machines": machine_data, "makespan": result.get("makespan", 0)}
 
 
 def _format_args(tool_name: str, args: dict) -> str:
