@@ -103,8 +103,7 @@ def render_sidebar() -> tuple[object, bool]:
                 You will need your own API key from an LLM provider such as [OpenAI](https://platform.openai.com/account/api-keys), [DeepSeek](https://api-docs.deepseek.com/), etc or a local LLM.
                 - If you want to scale up or customize for your team or company, especially with really large datasets and graph data, 
                 reach out to us at [graphbees.qa@gmail.com](mailto:graphbees.qa@gmail.com).
-                - [☕ Support the project's development](https://buymeacoffee.com/hoavu.cs).
-                - [Report Issues](https://github.com/hoavu-cs/GraphBees/issues)
+                - [Report Issues](https://github.com/hoavu-cs/GraphBees/issues).
                 """
             )
 
