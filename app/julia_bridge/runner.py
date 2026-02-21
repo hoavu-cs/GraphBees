@@ -114,9 +114,6 @@ def init_julialg():
     # Activate environment safely (no string interpolation!)
     jl.Pkg.activate(_JULIALG_ENV)
 
-    # Ensure dependencies are instantiated
-    jl.Pkg.instantiate()
-
     # Check required packages
     installed = jl.seval("""
         deps = keys(Pkg.project().dependencies)
@@ -125,6 +122,9 @@ def init_julialg():
 
     has_julialg, has_graphs, has_jump, has_highs = map(bool, installed)
 
+    # Add any missing packages before instantiating.
+    # JuliAlg must be added via URL (not registered in the General registry),
+    # so Pkg.add must run before Pkg.instantiate to ensure the Manifest is valid.
     if not all([has_julialg, has_graphs, has_jump, has_highs]):
         print("Installing missing Julia packages into JuliAlgEnv...")
 
@@ -139,6 +139,20 @@ def init_julialg():
 
         if not has_highs:
             jl.Pkg.add("HiGHS")
+
+    # Instantiate after packages are guaranteed to be in the Manifest.
+    # If the Manifest was written by a different Julia version, delete and retry.
+    try:
+        jl.Pkg.instantiate()
+    except Exception:
+        manifest = os.path.join(_JULIALG_ENV, "Manifest.toml")
+        if os.path.exists(manifest):
+            os.remove(manifest)
+        jl.Pkg.add(url="https://github.com/hoavu-cs/JuliAlg.git")
+        jl.Pkg.add("Graphs")
+        jl.Pkg.add("JuMP")
+        jl.Pkg.add("HiGHS")
+        jl.Pkg.instantiate()
 
     jl.seval("using JuliAlg, Graphs")
 
@@ -289,6 +303,26 @@ def set_cover(subsets: list[list[int]], costs: list[float]) -> dict:
     """
     result = jl.seval(code)
     return {"total_cost": float(result[0]), "selected_subsets": [int(x) - 1 for x in result[1]]}
+
+
+def makespan_scheduling(jobs: list[float], m: int) -> dict:
+    """Schedule jobs on m machines to minimize makespan using LPT heuristic."""
+    code = f"""
+    begin
+        makespan, assignments = lpt_makespan({_jl_vector([float(j) for j in jobs])}, {m})
+        (makespan, collect(assignments))
+    end
+    """
+    result = jl.seval(code)
+    assignments = [int(x) - 1 for x in result[1]]
+    machines: list[list[int]] = [[] for _ in range(m)]
+    for job_idx, machine_idx in enumerate(assignments):
+        machines[machine_idx].append(job_idx)
+    return {
+        "makespan": float(result[0]),
+        "assignments": assignments,
+        "machines": machines,
+    }
 
 
 def max_coverage(subsets: list[list[int]], k: int) -> dict:
