@@ -380,9 +380,9 @@ def main():
     # File attachment (above the chat input)
     _MAX_BYTES = 1 * 1024 * 1024
     uploaded = st.file_uploader(
-        "Attach a file",
+        "Optional: Attach a file (to provide data more easily)",
         type=["txt", "csv"],
-        label_visibility="collapsed",
+        label_visibility="visible",
         key=f"upload_{st.session_state.upload_key}",
     )
     if uploaded is not None:
