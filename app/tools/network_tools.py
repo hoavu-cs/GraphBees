@@ -5,6 +5,7 @@ Each tool wraps a JuliAlg function and returns a JSON-serializable result.
 
 from app.julia_bridge.runner import (
     bin_packing,
+    makespan_scheduling,
     max_coverage,
     mixed_ilp,
     ptas_knapsack,
@@ -55,6 +56,12 @@ TOOL_META = {
         "algorithm": "LP Relaxation (exact for bipartite graph matching)",
         "guarantee": "Exact optimal",
         "complexity": "O(n^3) via LP",
+    },
+    "makespan_scheduling": {
+        "display_name": "Makespan Scheduling",
+        "algorithm": "Longest Processing Time (LPT)",
+        "guarantee": "(4/3 - 1/(3m))-approximation",
+        "complexity": "O(n log n)",
     },
 }
 
@@ -138,6 +145,18 @@ TOOLS = [
         },
     },
     {
+        "name": "makespan_scheduling",
+        "description": "Schedule n jobs on m identical parallel machines to minimize makespan (total completion time) using the LPT heuristic. (4/3 - 1/(3m))-approximation guarantee.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "jobs": {"type": "array", "items": {"type": "number"}, "description": "Processing time of each job"},
+                "m": {"type": "integer", "description": "Number of machines"},
+            },
+            "required": ["jobs", "m"],
+        },
+    },
+    {
         "name": "mixed_ilp",
         "description": "Solve a mixed ILP model formulated from natural language using JuMP + HiGHS.",
         "parameters": {
@@ -199,6 +218,8 @@ def dispatch(tool_name: str, args: dict):
             else None
         )
         return weighted_bipartite_matching(args["left_nodes"], args["right_nodes"], edges, weights)
+    elif tool_name == "makespan_scheduling":
+        return makespan_scheduling(args["jobs"], args["m"])
     elif tool_name == "mixed_ilp":
         return mixed_ilp(
             args["variables"],
