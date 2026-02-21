@@ -152,6 +152,54 @@ def _bin_packing_figure(chart: dict) -> go.Figure:
     return fig
 
 
+def _makespan_figure(chart: dict) -> go.Figure:
+    """Build a Plotly horizontal stacked bar chart for makespan scheduling."""
+    machines = chart["machines"]
+    makespan = chart["makespan"]
+
+    fig = go.Figure()
+
+    max_jobs = max((len(m["jobs"]) for m in machines), default=0)
+    for layer in range(max_jobs):
+        durations = []
+        texts = []
+        for m in machines:
+            if layer < len(m["jobs"]):
+                job = m["jobs"][layer]
+                durations.append(job["duration"])
+                texts.append(f"Job {job['index']} ({job['duration']}h)")
+            else:
+                durations.append(0)
+                texts.append("")
+
+        fig.add_trace(go.Bar(
+            y=[m["label"] for m in machines],
+            x=durations,
+            text=texts,
+            textposition="inside",
+            orientation="h",
+            marker=dict(color=PALETTE[layer % len(PALETTE)]),
+            showlegend=False,
+        ))
+
+    fig.add_vline(
+        x=makespan,
+        line_dash="dash",
+        line_color="red",
+        annotation_text=f"Makespan = {makespan}",
+        annotation_position="top right",
+    )
+
+    fig.update_layout(
+        barmode="stack",
+        title="Makespan Scheduling: Jobs per Group",
+        xaxis_title="Total Load",
+        margin=dict(t=40, b=40, l=80, r=20),
+        height=300,
+    )
+    return fig
+
+
 def _chip(label: str, value: str, accent: str = "#5b5fc7") -> str:
     """Render a meta chip as an HTML span."""
     return (
@@ -163,7 +211,7 @@ def _chip(label: str, value: str, accent: str = "#5b5fc7") -> str:
     )
 
 
-def _render_tool_card(log: dict):
+def _render_tool_card(log: dict, idx: int = 0):
     """Render a tool execution card."""
     is_error = bool(log.get("error"))
     border_color = "#d93025" if is_error else ACCENT
@@ -209,11 +257,13 @@ def _render_tool_card(log: dict):
         if log.get("chart"):
             chart = log["chart"]
             if chart["type"] == "knapsack":
-                st.plotly_chart(_knapsack_figure(chart), use_container_width=True)
+                st.plotly_chart(_knapsack_figure(chart), use_container_width=True, key=f"chart_{idx}_knapsack")
             elif chart["type"] == "interval":
-                st.plotly_chart(_interval_figure(chart), use_container_width=True)
+                st.plotly_chart(_interval_figure(chart), use_container_width=True, key=f"chart_{idx}_interval")
             elif chart["type"] == "bin_packing":
-                st.plotly_chart(_bin_packing_figure(chart), use_container_width=True)
+                st.plotly_chart(_bin_packing_figure(chart), use_container_width=True, key=f"chart_{idx}_bin_packing")
+            elif chart["type"] == "makespan":
+                st.plotly_chart(_makespan_figure(chart), use_container_width=True, key=f"chart_{idx}_makespan")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -316,12 +366,12 @@ def main():
     )
 
     # Render chat history
-    for msg in st.session_state.messages:
+    for msg_idx, msg in enumerate(st.session_state.messages):
         with st.chat_message(msg["role"]):
             if msg["role"] == "assistant":
                 # Render tool cards first, then the answer
-                for log in msg.get("tool_logs", []):
-                    _render_tool_card(log)
+                for idx, log in enumerate(msg.get("tool_logs", [])):
+                    _render_tool_card(log, msg_idx * 100 + idx)
                 if msg.get("content"):
                     st.markdown(_escape_dollars(msg["content"]))
             else:
@@ -384,9 +434,10 @@ def main():
                     })
                     return
 
-            # Render tool cards
-            for log in result.get("tool_logs", []):
-                _render_tool_card(log)
+            # Render tool cards (use message count as base to avoid key collisions with history)
+            msg_base = len(st.session_state.messages) * 100
+            for idx, log in enumerate(result.get("tool_logs", [])):
+                _render_tool_card(log, msg_base + idx)
 
             # Render answer
             answer = result.get("answer", "")
