@@ -154,6 +154,9 @@ def init_julialg():
         jl.Pkg.add("HiGHS")
         jl.Pkg.instantiate()
 
+    # Always pull the latest JuliAlg from GitHub on startup.
+    jl.Pkg.update("JuliAlg")
+
     jl.seval("using JuliAlg, Graphs")
 
 
