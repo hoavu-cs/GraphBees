@@ -100,7 +100,7 @@ def render_sidebar() -> tuple[object, bool]:
                 """
                 - The online version is mostly for demonstration purposes, LLM API costs are on me. Please use responsibly.
                 - For strong and multithreaded performance, consider [running locally](https://github.com/hoavu-cs/GraphBees#running-locally). 
-                You will need your own API key from an LLM provider such as [OpenAI](https://platform.openai.com/account/api-keys), [Claude](https://platform.claude.com/), [Gemini](https://ai.google.dev/gemini-api/docs), [DeepSeek](https://api-docs.deepseek.com/), etc or a local LLM.
+                You will need your own API key from an LLM provider such as [OpenAI](https://platform.openai.com/account/api-keys), [Claude](https://platform.claude.com/), [Gemini](https://ai.google.dev/gemini-api/docs), [DeepSeek](https://api-docs.deepseek.com/), etc or a local LLM. Gemini-flash-preview balances speed and reasoning well for tool-calling. Reasoning models are more powerful but can be slower. Local models that are too small may struggle with accurate tool-calling.
                 - If you want to scale up or customize for your team or company, especially with really large datasets and graph data, 
                 reach out to us at [graphbees.qa@gmail.com](mailto:graphbees.qa@gmail.com).
                 - [Report Issues](https://github.com/hoavu-cs/GraphBees/issues).

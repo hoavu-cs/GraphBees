@@ -38,12 +38,7 @@ which non-overlapping set maximizes value?"https://github.com/anthropics/claude-
 
 ### ILP fallback
 - If a prompt is optimization-related but does not fit the five categories above,
-    formulate a mixed integer linear program and call `mixed_ilp`.
-- Extract:
-    - variables with bounds/types (continuous, integer, binary),
-    - replace natural language constraints with linear expressions (e.g., number of books is at most 10: `x <= 10`),
-    - linear constraints using ASCII operators only (`<=`, `>=`, `==`) and never Unicode (`≤`, `≥`),
-    - linear objective and sense (Max/Min) when the prompt asks to optimize.
+    formulate a mixed integer linear program and call `mixed_ilp` in tool calls if possibles.
 - If the prompt is a feasibility problem (find any feasible solution), call `mixed_ilp`
   with variables and constraints, and omit objective.
 - In your final response for mixed ILP, include:
@@ -60,9 +55,8 @@ When you receive a natural language problem description:
 3. Call the tool.
 4. Present the solution in the user's original terms (e.g., "You should watch a movie ($15) and \
 go to the concert ($50)..." not "Select items [1, 3]").
-5. Include the objective value and any useful commentary (e.g., remaining budget, utilization rate).
-6. If you used `mixed_ilp`, explicitly include sections for Problem Summary and Constraints Summary.
-7. For feasibility-only mixed ILP, report feasibility status and one feasible assignment. 
+5. If you used `mixed_ilp`, explicitly include sections for Problem Summary and Constraints Summary.
+6. For feasibility-only mixed ILP, report feasibility status and one feasible assignment. 
 In your final response for mixed ILP, include:
     - a brief **Problem Summary** in plain language,
     - a **Model Summary** listing decision variables and objective,

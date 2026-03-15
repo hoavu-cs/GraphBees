@@ -35,6 +35,8 @@ Use the provided launcher scripts (recommended).
 
 ### macOS / Linux
 
+You would need to provide an LLM either through API or a local LLM. In my experience, Gemini flash preview balances speed and reasoning well for tool-calling. Reasoning models are more powerful but can be slower. Local models that are too small may struggle with accurate tool-calling (qwen3.5:35b is reliable for smaller inputs). 
+
 ```bash
 git clone https://github.com/hoavu-cs/GraphBees.git
 cd GraphBees
@@ -42,12 +44,12 @@ cd GraphBees
 ```
 
 Enter LLM API, LLM URL, and MODEL (press Enter to keep current value if existed)
-It would look like this
+For example, it would look like this
 ```
 🛠️  Configure .env values (press Enter to keep current value)
-LLM_API [current: ]: 
-LLM_URL [current: ]: 
-MODEL [current: ]: 
+LLM_API [current:  ]: ... # required
+LLM_URL [current: ]: # required e.g., https://generativelanguage.googleapis.com/v1beta/openai/
+MODEL [current: ]: # required e.g., gemini-3-flash-preview
 ```
 
 ### Windows (PowerShell)
@@ -64,10 +66,10 @@ Enter LLM API, LLM URL, and MODEL (press Enter to keep current value)
 
 Few local LLMs are reliable enough with tool-calling. If you want to use a local LLM with Ollama, first set up your model in Ollama, then configure `.env` like this.
 
-```
+```dotenv
 LLM_API=ollama
 LLM_URL=http://127.0.0.1:11434/v1
-MODEL=...
+MODEL=  # required, e.g., qwen3.5:35b  
 GRAPHBEES_ALLOW_SHUTDOWN=1
 ```
 
@@ -108,10 +110,9 @@ Open: `http://127.0.0.1:8501` (or configured port).
 The launcher scripts create/update `.env` automatically. If you configure manually, use:
 
 ```dotenv
-LLM_API= # required, e.g. openai, claude, gemini, deepseek, ollama, etc.
-LLM_URL= # required, e.g. https://api.openai.com/v1
-MODEL=   # required, e.g. gpt-4
-GRAPHBEES_ALLOW_SHUTDOWN=1
+LLM_API [current:  ]: ... # required
+LLM_URL [current: ]: # required e.g., https://generativelanguage.googleapis.com/v1beta/openai/
+MODEL [current: ]: # required e.g., gemini-3-flash-preview
 ```
 
 ### Ollama example
@@ -119,7 +120,7 @@ GRAPHBEES_ALLOW_SHUTDOWN=1
 ```dotenv
 LLM_API=ollama
 LLM_URL=http://127.0.0.1:11434/v1
-MODEL=
+MODEL=  # required, e.g., qwen3.5:35b  
 GRAPHBEES_ALLOW_SHUTDOWN=1
 ```
 
