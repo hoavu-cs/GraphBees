@@ -50,9 +50,6 @@ LLM_URL [current: ]:
 MODEL [current: ]: 
 ```
 
-
-```
-
 ### Windows (PowerShell)
 
 ```powershell
