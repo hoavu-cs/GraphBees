@@ -108,7 +108,7 @@ def render_sidebar() -> tuple[object, bool]:
             )
 
         if not shutdown_hidden:
-            exit_app = st.button("Shut Down", disabled=shutdown_disabled, use_container_width=True)
+            exit_app = st.button("Shut Down", disabled=shutdown_disabled, width='stretch')
             if shutdown_disabled:
                 st.caption("Disabled on cloud deployments")
             elif exit_app:
@@ -132,7 +132,7 @@ def render_chat_download(container: object, messages: list[dict]) -> None:
         data=_chat_to_txt_bytes(messages),
         file_name="graphbees_chat.txt",
         mime="text/plain; charset=utf-8",
-        use_container_width=True,
+        width='stretch',
     )
 
 

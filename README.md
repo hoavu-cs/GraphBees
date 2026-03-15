@@ -10,7 +10,7 @@ Query => LLM => Algorithmic Solvers => Answer => LLM => Output.
 ## Features
 
 - Natural-language optimization workflow
-- Tool-backed solvers (knapsack, bin packing, interval scheduling, set cover, max coverage, bipartite matching, mixed ILP,...)
+- Tool-backed solvers (knapsack, bin packing, interval scheduling, set cover, max coverage, bipartite matching, makespan scheduling, mixed ILP,...)
 - Interactive visual summaries in the chat UI for some problems
 - Tutorials page with example problem formulations
 
@@ -45,7 +45,7 @@ Enter LLM API, LLM URL, and MODEL (press Enter to keep current value if existed)
 It would look like this
 ```
 🛠️  Configure .env values (press Enter to keep current value)
-LLM_API [current: sk-8...]: 
+LLM_API [current: ]: 
 LLM_URL [current: ]: 
 MODEL [current: ]: 
 ```
@@ -108,9 +108,9 @@ Open: `http://127.0.0.1:8501` (or configured port).
 The launcher scripts create/update `.env` automatically. If you configure manually, use:
 
 ```dotenv
-LLM_API=...
-LLM_URL=... # required 
-MODEL=...   # required 
+LLM_API= # required, e.g. openai, claude, gemini, deepseek, ollama, etc.
+LLM_URL= # required, e.g. https://api.openai.com/v1
+MODEL=   # required, e.g. gpt-4
 GRAPHBEES_ALLOW_SHUTDOWN=1
 ```
 

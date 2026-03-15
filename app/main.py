@@ -257,13 +257,13 @@ def _render_tool_card(log: dict, idx: int = 0):
         if log.get("chart"):
             chart = log["chart"]
             if chart["type"] == "knapsack":
-                st.plotly_chart(_knapsack_figure(chart), use_container_width=True, key=f"chart_{idx}_knapsack")
+                st.plotly_chart(_knapsack_figure(chart), width='stretch', key=f"chart_{idx}_knapsack")
             elif chart["type"] == "interval":
-                st.plotly_chart(_interval_figure(chart), use_container_width=True, key=f"chart_{idx}_interval")
+                st.plotly_chart(_interval_figure(chart), width='stretch', key=f"chart_{idx}_interval")
             elif chart["type"] == "bin_packing":
-                st.plotly_chart(_bin_packing_figure(chart), use_container_width=True, key=f"chart_{idx}_bin_packing")
+                st.plotly_chart(_bin_packing_figure(chart), width='stretch', key=f"chart_{idx}_bin_packing")
             elif chart["type"] == "makespan":
-                st.plotly_chart(_makespan_figure(chart), use_container_width=True, key=f"chart_{idx}_makespan")
+                st.plotly_chart(_makespan_figure(chart), width='stretch', key=f"chart_{idx}_makespan")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
