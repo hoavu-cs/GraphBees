@@ -109,8 +109,8 @@ The launcher scripts create/update `.env` automatically. If you configure manual
 
 ```dotenv
 LLM_API=...
-LLM_URL=... # required (e.g., https://api.deepseek.com)
-MODEL=...   # required (e.g., deepseek-chat)
+LLM_URL=... # required 
+MODEL=...   # required 
 GRAPHBEES_ALLOW_SHUTDOWN=1
 ```
 
@@ -119,7 +119,7 @@ GRAPHBEES_ALLOW_SHUTDOWN=1
 ```dotenv
 LLM_API=ollama
 LLM_URL=http://127.0.0.1:11434/v1
-MODEL=MFDoom/deepseek-r1-tool-calling:7b
+MODEL=
 GRAPHBEES_ALLOW_SHUTDOWN=1
 ```
 
