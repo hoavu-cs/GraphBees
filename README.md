@@ -46,16 +46,11 @@ It would look like this
 ```
 🛠️  Configure .env values (press Enter to keep current value)
 LLM_API [current: sk-8...]: 
-LLM_URL [current: https://api.deepseek.com]: 
-MODEL [current: deepseek-chat]: 
+LLM_URL [current: ]: 
+MODEL [current: ]: 
 ```
 
-or 
 
-```
-LLM_API=sk-8...
-LLM_URL=https://api.openai.com/v1
-MODEL=gpt-4.1-mini
 ```
 
 ### Windows (PowerShell)
@@ -75,7 +70,7 @@ Few local LLMs are reliable enough with tool-calling. If you want to use a local
 ```
 LLM_API=ollama
 LLM_URL=http://127.0.0.1:11434/v1
-MODEL=MFDoom/deepseek-r1-tool-calling:7b
+MODEL=...
 GRAPHBEES_ALLOW_SHUTDOWN=1
 ```
 
